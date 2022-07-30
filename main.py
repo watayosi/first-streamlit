@@ -9,5 +9,5 @@ df = pd.DataFrame(
     )
 st.table(df.style.highlight_max(axis=0))
 
-if st.button('Show grph?'):
+if st.button('Show graph?'):
     st.line_chart(df)
