@@ -67,7 +67,7 @@ companies = st.multiselect(
     ['Daikoku']
 )
 data = df.loc[companies]
-st.write("### 株価", data)
+st.write("## 株価", data)
 #st.table(df.style.highlight_max(axis=1))
 
 data = data.T.reset_index()
