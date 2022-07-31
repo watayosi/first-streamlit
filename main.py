@@ -7,7 +7,15 @@ import pandas as pd
 import altair as alt
 import yfinance as yf
 
+pd.options.display.precision = 0
+
 st.title('yfinance by Streamlit')
+st.subheader('昨日のダイコク電機の株価')
+dk = yf.Ticker('6430.T')
+dkpd = dk.history(period='2d')
+delta = dkpd.iloc[1, 3] - dkpd.iloc[0, 3]
+value = dkpd.iloc[1, 3]
+st.metric(label='株価', value=f'{value}円', delta=f'{delta}円')
 
 st.sidebar.write("""
 # 表示設定
@@ -27,7 +35,7 @@ st.sidebar.write("""
 """)
 ymin,ymax = st.sidebar.slider(
     '範囲を指定可能です。',
-    0, 30000, (500, 3000)
+    0, 30000, (500, 4500)
 )
 
 @st.cache
@@ -67,8 +75,10 @@ companies = st.multiselect(
     ['Daikoku']
 )
 data = df.loc[companies]
-st.write("## 株価", data)
-#st.table(df.style.highlight_max(axis=1))
+#deta_revece = data.columns[::-1]
+#deta_revece.columns[::-1]
+#st.write("## 株価", data)
+st.dataframe(data.style.highlight_max(axis=1))
 
 data = data.T.reset_index()
 data = pd.melt(data,id_vars=['Date']).rename(
