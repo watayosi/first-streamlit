@@ -1,6 +1,6 @@
-from time import strftime
-
-from sqlalchemy import true
+#from time import strftime
+#
+#from sqlalchemy import true
 import streamlit as st
 import numpy as np
 import pandas as pd
@@ -56,8 +56,7 @@ tickers = {
     'Heiwa' : '6412.T',
     'Sankyo' : '6417.T',
     'FujiShoji' : '6257.T',
-    'Axell' : '6723.T',
-    'DML' : '3652.T'
+    'Axell' : '6723.T'
 }
 
 df = get_data(days, tickers)
