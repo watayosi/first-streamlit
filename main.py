@@ -7,7 +7,7 @@ import pandas as pd
 import altair as alt
 import yfinance as yf
 
-pd.options.display.precision = 0
+#pd.options.display.precision = 0
 
 st.title('yfinance by Streamlit')
 st.subheader('現在のダイコク電機の株価')
@@ -82,6 +82,7 @@ data = df.loc[companies]
 #deta_revece = data.columns[::-1]
 #deta_revece.columns[::-1]
 #st.write("## 株価", data)
+data = data.round(1)
 st.dataframe(data.style.highlight_max(axis=1))
 
 data = data.T.reset_index()
