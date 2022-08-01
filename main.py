@@ -10,7 +10,7 @@ import yfinance as yf
 pd.options.display.precision = 0
 
 st.title('yfinance by Streamlit')
-st.subheader('昨日のダイコク電機の株価')
+st.subheader('現在のダイコク電機の株価')
 dk = yf.Ticker('6430.T')
 dkpd = dk.history(period='2d')
 delta = dkpd.iloc[1, 3] - dkpd.iloc[0, 3]
@@ -27,8 +27,8 @@ st.sidebar.write("""
 
 days =st.sidebar.slider('日数を指定戒能です。',1,90,30)
 st.write(f"""
-### **{days}日間** の株価データ
-# """)
+### **各社の{days}日間** の株価データ
+""")
 
 st.sidebar.write("""
 ## 株価グラフの範囲指定
@@ -59,12 +59,16 @@ def get_data(days, tickers):
 tickers = {
     'Nikkei225' : '^N225',
     'Daikoku' : '6430.T',
-    'Segasammy' : '6460.T',
-    'Mars' : '6419.T',
+    'SegasammyHD' : '6460.T',
+    'MarsHD' : '6419.T',
+    'Glory' : '6457.T',
     'Heiwa' : '6412.T',
     'Sankyo' : '6417.T',
     'FujiShoji' : '6257.T',
-    'Axell' : '6723.T'
+    'Univarsal' : '6425.T',
+    'Ohizumi' : '6428.T',
+    'Fields' : '2767.T',
+    'Axell' : '6730.T'
 }
 
 df = get_data(days, tickers)
