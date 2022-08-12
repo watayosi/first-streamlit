@@ -9,10 +9,12 @@ import yfinance as yf
 
 #pd.options.display.precision = 0
 
-st.title('yfinance by Streamlit')
+st.title('― 業界株価分析site -')
 st.subheader('現在のダイコク電機の株価')
 dk = yf.Ticker('6430.T')
 dkpd = dk.history(period='2d')
+dkpd = dkpd.astype('int64')
+dkpd.iloc[:, :5]
 delta = dkpd.iloc[1, 3] - dkpd.iloc[0, 3]
 value = dkpd.iloc[1, 3]
 st.metric(label='株価', value=f'{value}円', delta=f'{delta}円')
@@ -27,7 +29,8 @@ st.sidebar.write("""
 
 days =st.sidebar.slider('日数を指定戒能です。',1,90,30)
 st.write(f"""
-### **各社の{days}日間** の株価データ
+## **各社の{days}日間** の株データ
+### 株価　推移
 """)
 
 st.sidebar.write("""
@@ -38,18 +41,15 @@ ymin,ymax = st.sidebar.slider(
     0, 30000, (500, 4500)
 )
 
-@st.cache
-def get_data(days, tickers):
+#@st.cache
+def get_data(days, tickers, moji):
     df = pd.DataFrame()
     for company in tickers.keys():
         tkr = yf.Ticker(tickers[company])
-        #divdf = pd.DataFrame(
-        #    tkr.dividends
-        #)
-        #divdf.iloc[::-1]
         hist = tkr.history(period=f'{days}d')
         hist.index = hist.index.strftime('%d %B %Y')
-        hist = hist[['Close']]
+#        hist = hist[['Close']]
+        hist = hist[[moji]]
         hist.columns = [company]
         hist = hist.T
         hist.index.name = 'Name'
@@ -71,19 +71,17 @@ tickers = {
     'Axell' : '6730.T'
 }
 
-df = get_data(days, tickers)
-
+df = get_data(days, tickers,'Close')
 companies = st.multiselect(
     '会社をリストから指定できます。',
     list(df.index),
     ['Daikoku']
 )
 data = df.loc[companies]
-#deta_revece = data.columns[::-1]
-#deta_revece.columns[::-1]
-#st.write("## 株価", data)
-data = data.round(1)
+data = data.astype('int64')
+data = data[data.columns[::-1]]
 st.dataframe(data.style.highlight_max(axis=1))
+data = data[data.columns[::-1]]
 
 data = data.T.reset_index()
 data = pd.melt(data,id_vars=['Date']).rename(
@@ -100,6 +98,40 @@ chart = (
 )
 
 st.altair_chart(chart, use_container_width=True)
+
+with st.expander("出来高　推移（(株)）"):
+    df = get_data(days, tickers,'Volume')
+    data = df.loc[companies]
+    data = data[data.columns[::-1]]
+    st.dataframe(data.style.highlight_max(axis=1))
+#    data = data[data.columns[::-1]]
+
+with st.expander("時価総額　推移 (百万円)"):
+    # 発行株式をytのjsonから取得すると遅いので固定値
+    shares = [0,
+            14783000,
+            220679008,
+            16536400,
+            58767900,
+            98631504,
+            54791000,
+            22395500,
+            77484000,
+            22495300,
+            32331700,
+            10828400]
+    df = get_data(days, tickers,'Close')
+    #時価総額の計算
+    for i, (index, listdata) in enumerate(df.iterrows()):
+        #onelist = df.iloc[index]
+        listdata = [n*shares[i]/1000000 for n in listdata ]
+        df.loc[index] = listdata        
+    
+    data = df.loc[companies]
+    data = data.astype('int64')
+    data = data[data.columns[::-1]]
+    st.dataframe(data.style.highlight_max(axis=1))
+ #   data = data[data.columns[::-1]]
 
 #if st.button('Show graph?'):
 #    st.line_chart(df.T)
