@@ -12,20 +12,24 @@ import yfinance as yf
 st.title('― 業界株価分析site -')
 st.subheader('現在のダイコク電機の株価')
 dk = yf.Ticker('6430.T')
-dkpd = dk.history(period='2d')
-dkpd = dkpd.astype('int64')
-dkpd.iloc[:, :5]
-delta = dkpd.iloc[1, 3] - dkpd.iloc[0, 3]
-value = dkpd.iloc[1, 3]
-st.metric(label='株価', value=f'{value}円', delta=f'{delta}円')
+# エラーハンドリング：データが取得できたか
+if dkpd.empty:
+    st.error("株価データが取得できませんでした。ティッカー名や期間をご確認ください。")
+else:
+    dkpd = dk.history(period='2d')
+    dkpd = dkpd.astype('int64')
+    dkpd.iloc[:, :5]
+    delta = dkpd.iloc[1, 3] - dkpd.iloc[0, 3]
+    value = dkpd.iloc[1, 3]
+    st.metric(label='株価', value=f'{value}円', delta=f'{delta}円')
 
-st.sidebar.write("""
-# 表示設定
-下記オプションから、日数指定を可能です。
-""")
-st.sidebar.write("""
-## 表示日数設定
-""")
+    st.sidebar.write("""
+    # 表示設定
+    下記オプションから、日数指定を可能です。
+    """)
+    st.sidebar.write("""
+    ## 表示日数設定
+    """)
 
 days =st.sidebar.slider('日数を指定戒能です。',1,90,30)
 st.write(f"""
