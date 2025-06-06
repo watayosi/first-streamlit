@@ -12,12 +12,13 @@ import yfinance as yf
 st.title('― 業界株価分析site -')
 st.subheader('現在のダイコク電機の株価')
 dk = yf.Ticker('6430.T')
+dkpd = dk.history(period='2d')
+dkpd = dkpd.astype('int64')
 # エラーハンドリング：データが取得できたか
 if dkpd.empty:
     st.error("株価データが取得できませんでした。ティッカー名や期間をご確認ください。")
 else:
-    dkpd = dk.history(period='2d')
-    dkpd = dkpd.astype('int64')
+
     dkpd.iloc[:, :5]
     delta = dkpd.iloc[1, 3] - dkpd.iloc[0, 3]
     value = dkpd.iloc[1, 3]
