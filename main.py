@@ -67,6 +67,9 @@ def get_data(days, tickers, moji):
         except Exception as e:
             st.error(f"{company} ({symbol}) のデータ取得中に予期しないエラーが発生しました: {e}")
             continue
+        if hist.empty:
+            st.error(f"{company} ({symbol}) のデータが見つかりませんでした")
+            continue
         hist = hist.sort_index().tail(days)
         hist.index = hist.index.strftime('%d %B %Y')
         hist = hist[[moji]]
