@@ -96,6 +96,7 @@ st.dataframe(data.style.highlight_max(axis=1))
 data = data[data.columns[::-1]]
 
 data = data.T.reset_index()
+data = data.rename(columns={'index': 'Date'})
 data = pd.melt(data,id_vars=['Date']).rename(
     columns={'value':'Prices(JPN)'}
 )
