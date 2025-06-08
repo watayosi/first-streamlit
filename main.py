@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import altair as alt
 import pandas_datareader.data as web
+from pandas_datareader._utils import RemoteDataError
 from datetime import datetime, timedelta
 
 #pd.options.display.precision = 0
@@ -58,7 +59,14 @@ def get_data(days, tickers, moji):
     for company, symbol in tickers.items():
         if symbol.endswith('.T'):
             symbol = symbol.replace('.T', '.jp')
-        hist = web.DataReader(symbol, 'stooq', start, end)
+        try:
+            hist = web.DataReader(symbol, 'stooq', start, end)
+        except RemoteDataError as e:
+            st.error(f"{company} ({symbol}) のデータを取得できませんでした: {e}")
+            continue
+        except Exception as e:
+            st.error(f"{company} ({symbol}) のデータ取得中に予期しないエラーが発生しました: {e}")
+            continue
         hist = hist.sort_index().tail(days)
         hist.index = hist.index.strftime('%d %B %Y')
         hist = hist[[moji]]
