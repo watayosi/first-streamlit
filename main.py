@@ -5,14 +5,18 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import altair as alt
-import yfinance as yf
+import pandas_datareader.data as web
+from datetime import datetime, timedelta
 
 #pd.options.display.precision = 0
 
 st.title('― 業界株価分析site -')
 st.subheader('現在のダイコク電機の株価')
-dk = yf.Ticker('6430.T')
-dkpd = dk.history(period='2d')
+end = datetime.today()
+start = end - timedelta(days=7)
+dkpd = web.DataReader('6430.jp', 'stooq', start, end)
+dkpd = dkpd.sort_index()
+dkpd = dkpd.tail(2)
 
 # エラーハンドリング：データが取得できたか
 if dkpd.empty:
@@ -20,8 +24,8 @@ if dkpd.empty:
 else:
     dkpd = dkpd.astype('int64')
     dkpd.iloc[:, :5]
-    delta = dkpd.iloc[1, 3] - dkpd.iloc[0, 3]
-    value = dkpd.iloc[1, 3]
+    delta = dkpd.iloc[-1, 3] - dkpd.iloc[-2, 3]
+    value = dkpd.iloc[-1, 3]
     st.metric(label='株価', value=f'{value}円', delta=f'{delta}円')
 
     st.sidebar.write("""
@@ -49,11 +53,14 @@ ymin,ymax = st.sidebar.slider(
 #@st.cache
 def get_data(days, tickers, moji):
     df = pd.DataFrame()
-    for company in tickers.keys():
-        tkr = yf.Ticker(tickers[company])
-        hist = tkr.history(period=f'{days}d')
+    end = datetime.today()
+    start = end - timedelta(days=days * 2)
+    for company, symbol in tickers.items():
+        if symbol.endswith('.T'):
+            symbol = symbol.replace('.T', '.jp')
+        hist = web.DataReader(symbol, 'stooq', start, end)
+        hist = hist.sort_index().tail(days)
         hist.index = hist.index.strftime('%d %B %Y')
-#        hist = hist[['Close']]
         hist = hist[[moji]]
         hist.columns = [company]
         hist = hist.T
